@@ -20,14 +20,34 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
+      # Backend steps
+      - name: Install backend dependencies
+        working-directory: ./backend
         run: npm install
 
-      - name: Run tests
+      - name: Run backend tests
+        working-directory: ./backend
         run: npm run test
         env:
           TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
           SECRET: ${{ secrets.SECRET }}
+
+      # Frontend steps
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Run frontend tests
+        working-directory: ./frontend
+        run: npm run test
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Check frontend lint
+        working-directory: ./frontend
+        run: npm run lint
 
   tag_release:
     needs: [deployment_pipeline]
