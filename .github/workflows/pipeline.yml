@@ -20,7 +20,6 @@ jobs:
         with:
           node-version: '20'
 
-      # Backend steps
       - name: Install backend dependencies
         working-directory: ./backend
         run: npm install
@@ -32,7 +31,6 @@ jobs:
           TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
           SECRET: ${{ secrets.SECRET }}
 
-      # Frontend steps
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm install
@@ -48,6 +46,20 @@ jobs:
       - name: Check frontend lint
         working-directory: ./frontend
         run: npm run lint
+
+      - name: Deploy backend to production
+        if: env.DEPLOY_CONDITION == 'true'
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+
+      - name: Deploy frontend to production
+        if: env.DEPLOY_CONDITION == 'true'
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_FRONTEND_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
 
   tag_release:
     needs: [deployment_pipeline]
